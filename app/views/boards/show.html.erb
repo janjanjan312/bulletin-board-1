@@ -14,7 +14,7 @@
 
 <form action="/insert_post" method="post">
   <div>
-    <label for="">Title</label>
+    <label for="title_field">Title</label>
     <input id="title_field" type="text" name="title">
   </div>
 
@@ -39,7 +39,7 @@
 
 <h2>Active posts</h2>
 
-<% matching_posts = Post.where({ :board_id => @the_board.id }).order({ :expires_on => :asc })%>
+<% active_posts = Post.where("board_id = ? AND expires_on >= ?", @the_board.id, Date.today).order(:expires_on) %>
 
 <table border="1">
   <tr>
@@ -48,17 +48,34 @@
     <th>Posted on</th>
     <th>Expires on</th>
   </tr>
+
+  <% active_posts.each do |a_post| %>
+    <tr>
+      <td><%= a_post.title %></td>
+      <td><%= a_post.body %></td>
+      <td><%= a_post.created_at.strftime("%b %e, %Y") %></td>
+      <td><%= a_post.expires_on.strftime("%b %e, %Y") %></td>
+    </tr>
+  <% end %>
 </table>
 
-<% matching_posts.each do |a_post| %>
+<h2>Expired Posts</h2>
+
+<% expired_posts = Post.where("board_id = ? AND expires_on < ?", @the_board.id, Date.today).order(:expires_on) %>
+
+<table border="1">
   <tr>
-    <th><%= a_post.title %></th>
-    <th><%= a_post.body %></th>
-    <th><%= a_post.created_at.strftime("%b %e, %Y") %></th>
-    <th><%= a_post.expires_on.strftime("%b %e, %Y") %></th>
+    <th>Title</th>
+    <th>Body</th>
+    <th>Posted on</th>
+    <th>Expires on</th>
   </tr>
-
-
-<% end %>
-
+  <% expired_posts.each do |a_post| %>
+    <tr>
+      <td><%= a_post.title %></td>
+      <td><%= a_post.body %></td>
+      <td><%= a_post.created_at.strftime("%b %e, %Y") %></td>
+      <td><%= a_post.expires_on.strftime("%b %e, %Y") %></td>
+    </tr>
+  <% end %>
 </table>
